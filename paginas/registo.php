@@ -21,11 +21,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $sql = "INSERT INTO utilizador (username, password, email, idPerfil) VALUES (?, ?, ?, 1)"; // Perfil 1 é o cliente
         $stmt = mysqli_prepare($ligacao, $sql);
         mysqli_stmt_bind_param($stmt, "sss", $username, $password, $email);
+        
         if (mysqli_stmt_execute($stmt)) {
-            $_SESSION["username"] = $username;
-            $_SESSION["perfil"] = 1; // Perfil do cliente
-            header("Location: cliente_pagina.php");
-            exit();
+            // Obter o id do utilizador recém criado
+            $idUtilizador = mysqli_insert_id($ligacao);
+
+            // Criar a carteira associada ao utilizador com saldo inicial 0.0
+            $sqlCarteira = "INSERT INTO carteira (idUtilizador, saldo) VALUES (?, 0.0)";
+            $stmtCarteira = mysqli_prepare($ligacao, $sqlCarteira);
+            mysqli_stmt_bind_param($stmtCarteira, "i", $idUtilizador);
+
+            if (mysqli_stmt_execute($stmtCarteira)) {
+                // Se a carteira for criada com sucesso, configurar sessão e redirecionar
+                $_SESSION["username"] = $username;
+                $_SESSION["perfil"] = 1; // Perfil do cliente
+                $_SESSION["id"] = $idUtilizador; // Guardar o ID do utilizador na sessão
+                header("Location: login.php");
+                exit();
+            } else {
+                $erro = "Erro ao criar a carteira. Tente novamente mais tarde.";
+            }
         } else {
             $erro = "Erro ao registar. Tente novamente mais tarde.";
         }

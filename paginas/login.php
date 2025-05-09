@@ -16,19 +16,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Definir as variáveis de sessão
         $_SESSION["id"] = $user["id"];
         $_SESSION["username"] = $user["username"];
-        $_SESSION["perfil"] = $user["idPerfil"];
+        $_SESSION["idPerfil"] = $user["idPerfil"];
         
-        // Redirecionar com base no perfil
-        if ($user["idPerfil"] == 3) {
-            // Admin
-            header("Location: admin_pagina.php");
-        } elseif ($user["idPerfil"] == 2) {
-            // Funcionário
-            header("Location: funcionario_pagina.php");
-        } else {
-            // Cliente
-            header("Location: cliente_pagina.php");
-        }
+        // Redireciona para a dashboard com base no perfil
+        header("Location: dashboard.php");
         exit();
     } else {
         $erro = "Credenciais inválidas.";

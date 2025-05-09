@@ -1,60 +1,69 @@
 <?php
 session_start();
-require_once("validar_sessao.php");  // Verificação de sessão ativa (proteção)
 require_once("../basededados/basedados.h");
 
-$id = $_SESSION["id"];  // Pega o ID do utilizador logado
+$id = $_SESSION["id"];  // ID do utilizador logado
+$erro = null;
+$carteira = ['saldo' => 0.0]; // valor por defeito
 
-// Verificação se o formulário foi enviado
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $valor = floatval($_POST["valor"]);  // Valor a ser adicionado ou retirado
-    $tipo = $_POST["tipo"]; // Tipo: "adicionar" ou "levantar"
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    $valor = isset($_POST["valor"]) ? floatval($_POST["valor"]) : 0;
+    $tipo = $_POST["tipo"] ?? '';
 
-    // Verificar se o valor é positivo
     if ($valor <= 0) {
-        $erro = "O valor deve ser positivo."; // Erro se o valor for inválido
+        $erro = "O valor deve ser um número positivo.";
+    } elseif (!in_array($tipo, ["adicionar", "levantar"])) {
+        $erro = "Tipo de operação inválido.";
     } else {
-        // Verificar se o tipo é 'adicionar' ou 'levantar'
-        if ($tipo == "levantar") {
-            // Buscar o saldo atual antes de efetuar o levantamento
-            $carteira_sql = "SELECT saldo FROM carteira WHERE idUtilizador = $id";
-            $carteira_resultado = mysqli_query($ligacao, $carteira_sql);
-            $carteira = mysqli_fetch_assoc($carteira_resultado);
+        // Obter saldo atual
+        $stmt = $ligacao->prepare("SELECT saldo FROM carteira WHERE idUtilizador = ?");
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $resultado = $stmt->get_result();
+        $carteira = $resultado->fetch_assoc();
+        $stmt->close();
 
-            // Verificar se o saldo é suficiente para levantar
-            if ($carteira['saldo'] < $valor) {
-                $erro = "Saldo insuficiente para levantar esse valor.";  // Erro se o saldo for insuficiente
+        if (!$carteira) {
+            $erro = "Carteira não encontrada.";
+        } elseif ($tipo === "levantar" && $carteira["saldo"] < $valor) {
+            $erro = "Saldo insuficiente para levantamento.";
+        } else {
+            // Definir operação matemática
+            $novoSaldo = ($tipo === "adicionar") ? $carteira["saldo"] + $valor : $carteira["saldo"] - $valor;
+
+            // Atualizar saldo
+            $stmt = $ligacao->prepare("UPDATE carteira SET saldo = ? WHERE idUtilizador = ?");
+            $stmt->bind_param("di", $novoSaldo, $id);
+            $stmtSuccess = $stmt->execute();
+            $stmt->close();
+
+            if ($stmtSuccess) {
+                // Registar auditoria
+                $descricao = "$tipo saldo: $valor";
+                $stmt = $ligacao->prepare("INSERT INTO auditoria (operacao, valor, idOrigem, descricao) VALUES (?, ?, ?, ?)");
+                $stmt->bind_param("sdis", $tipo, $valor, $id, $descricao);
+                $stmt->execute();
+                $stmt->close();
+
+                // Atualizar saldo visível após operação
+                $carteira["saldo"] = $novoSaldo;
+            } else {
+                $erro = "Erro ao atualizar o saldo.";
             }
         }
-
-        // Determinar operação de adicionar ou levantar
-        $op = ($tipo === "adicionar") ? "+" : "-";
-
-        // Atualizar o saldo na tabela de carteira
-        $novo_saldo_sql = "UPDATE carteira SET saldo = saldo $op $valor WHERE idUtilizador = $id";
-        if (mysqli_query($ligacao, $novo_saldo_sql)) {
-            // Gravar a operação de auditoria
-            $descricao = "$tipo saldo: $valor";
-            $auditoria_sql = "INSERT INTO auditoria (operacao, valor, idOrigem, descricao) VALUES ('$tipo', $valor, $id, '$descricao')";
-            mysqli_query($ligacao, $auditoria_sql);
-        } else {
-            $erro = "Erro ao atualizar o saldo.";  // Erro ao tentar atualizar o saldo
-        }
-    }
-}
-
-// Buscar o saldo atual da carteira
-$carteira_sql = "SELECT saldo FROM carteira WHERE idUtilizador = $id";
-$carteira_resultado = mysqli_query($ligacao, $carteira_sql);
-
-if ($carteira_resultado) {
-    // Se a consulta foi bem-sucedida, verificar se há resultados
-    $carteira = mysqli_fetch_assoc($carteira_resultado);
-    if (!$carteira) {
-        $erro = "Não foi possível encontrar o saldo do utilizador.";
     }
 } else {
-    $erro = "Erro na consulta ao saldo.";
+    // Obter saldo atual se for GET
+    $stmt = $ligacao->prepare("SELECT saldo FROM carteira WHERE idUtilizador = ?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $resultado = $stmt->get_result();
+    $carteira = $resultado->fetch_assoc();
+    $stmt->close();
+
+    if (!$carteira) {
+        $erro = "Não foi possível encontrar o saldo.";
+    }
 }
 ?>
 
@@ -62,47 +71,41 @@ if ($carteira_resultado) {
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Atualizar Saldo - FelixBus</title>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
             margin: 0;
             padding: 0;
-            background-color: #f4f6f8;
-            color: #333;
         }
 
         .container {
-            width: 100%;
             max-width: 400px;
             margin: 50px auto;
-            background-color: white;
+            background: white;
             padding: 20px;
             border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
 
         h2 {
             text-align: center;
-            color: #333;
         }
 
         input, select, button {
             width: 100%;
-            padding: 12px;
+            padding: 10px;
             margin: 10px 0;
-            border: 1px solid #ddd;
             border-radius: 5px;
-            font-size: 1em;
+            border: 1px solid #ccc;
         }
 
         button {
             background-color: #32CD32;
             color: white;
-            cursor: pointer;
             font-weight: bold;
-            border: none;
+            cursor: pointer;
         }
 
         button:hover {
@@ -114,37 +117,30 @@ if ($carteira_resultado) {
             text-align: center;
         }
 
-        p.saldo {
-            font-size: 1.2em;
+        .saldo {
             text-align: center;
+            font-size: 1.2em;
         }
     </style>
 </head>
 <body>
-
-<!-- Container do Formulário -->
 <div class="container">
     <h2>Atualizar Saldo</h2>
-    
-    <!-- Exibição do saldo atual -->
-    <?php if (isset($erro)) { ?>
-        <p class="error"><?= $erro ?></p>
-    <?php } else { ?>
+
+    <?php if ($erro): ?>
+        <p class="error"><?= htmlspecialchars($erro) ?></p>
+    <?php else: ?>
         <p class="saldo">Saldo atual: €<?= number_format($carteira['saldo'], 2) ?></p>
-    <?php } ?>
-    
-    <!-- Formulário de adição ou levantamento -->
+    <?php endif; ?>
+
     <form method="post">
-        <input type="number" name="valor" step="0.01" min="0" placeholder="Valor" required>
-        
+        <input type="number" name="valor" step="0.01" min="0.01" placeholder="Valor" required>
         <select name="tipo" required>
             <option value="adicionar">Adicionar</option>
             <option value="levantar">Levantar</option>
         </select>
-        
         <button type="submit">Submeter</button>
     </form>
 </div>
-
 </body>
 </html>
