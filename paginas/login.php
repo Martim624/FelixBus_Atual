@@ -120,6 +120,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         .login-box button {
             width: 100%;
             padding: 12px;
+            margin: 6px;
             background-color: #32CD32;
             color: white;
             border: none;
@@ -186,6 +187,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <input type="password" name="password" placeholder="Palavra-passe" required>
             <button type="submit">Entrar</button>
         </form>
+            <button href="registo.php">Regista-te</button>
         <?php if (isset($erro)) echo "<p class='error'>$erro</p>"; ?>
     </div>
 </div>
