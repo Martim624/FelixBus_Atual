@@ -18,7 +18,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $erro = "Nome de utilizador já existe.";
     } else {
         // Inserir o novo utilizador
-        $sql = "INSERT INTO utilizador (username, password, email, idPerfil) VALUES (?, ?, ?, 1)"; // Perfil 1 é o cliente
+        $sql = "INSERT INTO utilizador (username, password, email, idPerfil) VALUES (?, ?, ?, 2)"; // Perfil 2 é o cliente
         $stmt = mysqli_prepare($ligacao, $sql);
         mysqli_stmt_bind_param($stmt, "sss", $username, $password, $email);
         

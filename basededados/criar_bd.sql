@@ -28,7 +28,6 @@ CREATE TABLE utilizador (
     id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(40) NOT NULL UNIQUE,
     password VARCHAR(100) NOT NULL,
-    nome VARCHAR(80),
     email VARCHAR(80),
     morada VARCHAR(100),
     telemovel VARCHAR(15),
@@ -118,3 +117,17 @@ CREATE TABLE alerta (
     mensagem TEXT,
     dataPublicacao DATETIME DEFAULT CURRENT_TIMESTAMP
 );
+
+
+
+-- Inserção de rotas de exemplo
+INSERT INTO rota (origem, destino, dataViagem, hora, preco, capacidade)
+VALUES
+('Lisboa', 'Porto', '2025-06-01', '08:00:00', 15.00, 50),
+('Porto', 'Lisboa', '2025-06-01', '17:00:00', 15.00, 50),
+('Lisboa', 'Faro', '2025-06-02', '09:30:00', 20.00, 45),
+('Faro', 'Lisboa', '2025-06-02', '16:00:00', 20.00, 45),
+('Coimbra', 'Braga', '2025-06-03', '07:45:00', 12.50, 40),
+('Braga', 'Coimbra', '2025-06-03', '18:30:00', 12.50, 40),
+('Lisboa', 'Évora', '2025-06-04', '10:00:00', 10.00, 35),
+('Évora', 'Lisboa', '2025-06-04', '15:30:00', 10.00, 35);

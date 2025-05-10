@@ -252,7 +252,7 @@ $alertas = mysqli_query($ligacao, "SELECT * FROM alerta ORDER BY dataPublicacao 
     <div class="menu" id="menu">
         <a href="login.php">Login</a>
         <a href="registo.php">Registo</a>
-        <a href="consultar_rotas.php">Rotas</a>
+        <a href="rotas.php">Rotas</a>
         <a href="#">Contactos</a>
     </div>
 </nav>
@@ -263,7 +263,7 @@ $alertas = mysqli_query($ligacao, "SELECT * FROM alerta ORDER BY dataPublicacao 
         <h1>Bem-vindo à FelixBus</h1>
         <p>Viaje com conforto, segurança e eficiência.</p>
         <div class="hero-buttons">
-            <a href="consultar_rotas.php">Ver Rotas</a>
+            <a href="rotas.php">Ver Rotas</a>
             <a href="registo.php">Registe-se Agora</a>
         </div>
     </div>

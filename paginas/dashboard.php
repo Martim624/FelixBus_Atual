@@ -77,7 +77,6 @@ function obterNomePerfil($idPerfil) {
             background: url('paisagem.jpg') center/cover no-repeat;
             background-size: cover;
             color: #333;
-            overflow: hidden;
         }
 
         .background-blur {
@@ -333,7 +332,7 @@ function obterNomePerfil($idPerfil) {
             <?php if (temPerfil(2)): ?>
                 <h3>Cliente</h3>
                 <ul>
-                    <li><a href="consultar_rotas.php">Consultar Rotas</a></li>
+                    <li><a href="rotas.php">Consultar Rotas</a></li>
                     <li><a href="comprar_bilhete.php">Comprar Bilhetes</a></li>
                     <li><a href="meus_bilhetes.php">Meus Bilhetes</a></li>
                     <li><a href="carteira.php">Gerir Carteira</a></li>
