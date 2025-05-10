@@ -26,7 +26,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             // Obter o id do utilizador recém criado
             $idUtilizador = mysqli_insert_id($ligacao);
 
-            // Criar a carteira associada ao utilizador com saldo inicial 0.0
             $sqlCarteira = "INSERT INTO carteira (idUtilizador, saldo) VALUES (?, 0.0)";
             $stmtCarteira = mysqli_prepare($ligacao, $sqlCarteira);
             mysqli_stmt_bind_param($stmtCarteira, "i", $idUtilizador);

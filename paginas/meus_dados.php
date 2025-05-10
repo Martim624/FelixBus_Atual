@@ -121,12 +121,8 @@ if (!$dadosUtilizador) {
         <div class="dados">
             <p><strong>Nome:</strong> <?= $dadosUtilizador['username'] ?></p>
             <p><strong>Email:</strong> <?= $dadosUtilizador['email'] ?></p>
-            <?php if (isset($dadosUtilizador['morada'])): ?>
-                <p><strong>Morada:</strong> <?= $dadosUtilizador['morada'] ?></p>
-            <?php endif; ?>
-            <?php if (isset($dadosUtilizador['telemovel'])): ?>
-                <p><strong>Telemóvel:</strong> <?= $dadosUtilizador['telemovel'] ?></p>
-            <?php endif; ?>
+            <p><strong>Morada:</strong> <?= $dadosUtilizador['morada'] ?></p>
+            <p><strong>Telemóvel:</strong> <?= $dadosUtilizador['telemovel'] ?></p>
             <p><strong>Perfil:</strong> <?= obterNomePerfil($_SESSION['idPerfil']) ?></p>
         </div>
         

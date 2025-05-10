@@ -12,8 +12,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     if ($valor <= 0) {
         $erro = "O valor deve ser um número positivo.";
-    } elseif (!in_array($tipo, ["adicionar", "levantar"])) {
-        $erro = "Tipo de operação inválido.";
     } else {
         // Obter saldo atual
         $stmt = $ligacao->prepare("SELECT saldo FROM carteira WHERE idUtilizador = ?");
@@ -28,7 +26,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         } elseif ($tipo === "levantar" && $carteira["saldo"] < $valor) {
             $erro = "Saldo insuficiente para levantamento.";
         } else {
-            // Definir operação matemática
             $novoSaldo = ($tipo === "adicionar") ? $carteira["saldo"] + $valor : $carteira["saldo"] - $valor;
 
             // Atualizar saldo

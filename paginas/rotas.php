@@ -34,8 +34,8 @@ $resultado = mysqli_query($ligacao, $sql);
         </tr>
         <?php while ($rota = mysqli_fetch_assoc($resultado)): ?>
             <tr>
-                <td><?= htmlspecialchars($rota['origem']) ?></td>
-                <td><?= htmlspecialchars($rota['destino']) ?></td>
+                <td><?= $rota['origem'] ?></td>
+                <td><?= $rota['destino'] ?></td>
                 <td><?= $rota['dataViagem'] ?></td>
                 <td><?= $rota['hora'] ?></td>
                 <td><?= $rota['preco'] ?>€</td>

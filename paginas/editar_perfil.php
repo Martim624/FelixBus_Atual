@@ -10,7 +10,7 @@ if (!isset($_SESSION['id']) || !isset($_SESSION['idPerfil'])) {
 
 // Função para obter os dados do utilizador
 function obterDadosUtilizador($ligacao, $idUtilizador) {
-    $query = "SELECT username, email, idPerfil FROM utilizador WHERE id = ?";
+    $query = "SELECT username, email, morada, telemovel, idPerfil FROM utilizador WHERE id = ?";
     $stmt = mysqli_prepare($ligacao, $query);
     mysqli_stmt_bind_param($stmt, "i", $idUtilizador);
     mysqli_stmt_execute($stmt);
@@ -19,10 +19,10 @@ function obterDadosUtilizador($ligacao, $idUtilizador) {
 }
 
 // Função para atualizar os dados do utilizador
-function atualizarDadosUtilizador($ligacao, $idUtilizador, $username, $email, $idPerfil) {
-    $query = "UPDATE utilizador SET username = ?, email = ?, idPerfil = ? WHERE id = ?";
+function atualizarDadosUtilizador($ligacao, $idUtilizador, $username, $email, $morada , $telemovel, $idPerfil) {
+    $query = "UPDATE utilizador SET username = ?, email = ?, morada = ?, telemovel = ?, idPerfil = ? WHERE id = ?";
     $stmt = mysqli_prepare($ligacao, $query);
-    mysqli_stmt_bind_param($stmt, "ssii", $username, $email, $idPerfil, $idUtilizador);
+    mysqli_stmt_bind_param($stmt, "sssiii", $username, $email, $morada , $telemovel, $idPerfil, $idUtilizador);
     return mysqli_stmt_execute($stmt);
 }
 
@@ -31,18 +31,24 @@ $idUtilizador = $_SESSION['id'];
 $dadosUtilizador = obterDadosUtilizador($ligacao, $idUtilizador);
 $username = $dadosUtilizador['username'];
 $email = $dadosUtilizador['email'];
+$morada = $dadosUtilizador['morada'];
+$telemovel = $dadosUtilizador['telemovel'];
 $idPerfil = $dadosUtilizador['idPerfil'];
 
 // Se o formulário foi submetido
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = $_POST['username'];
     $email = $_POST['email'];
-    $idPerfil = $_POST['perfil'];
+    $morada = $_POST['morada'];
+    $telemovel = $_POST['telemovel'];
+    $idPerfil = $_SESSION['idPerfil'];
 
-    if (atualizarDadosUtilizador($ligacao, $idUtilizador, $username, $email, $idPerfil)) {
+    if (atualizarDadosUtilizador($ligacao, $idUtilizador, $username, $email, $morada, $telemovel, $idPerfil)) {
         $mensagem = "Dados atualizados com sucesso!";
         $_SESSION['username'] = $username;
-        $_SESSION['idPerfil'] = $idPerfil;
+        $_SESSION['email'] = $email;
+        $_SESSION['morada'] = $morada;
+        $_SESSION['telemovel'] = $telemovel;
     } else {
         $mensagem = "Erro ao atualizar os dados.";
     }
@@ -96,25 +102,31 @@ function obterNomePerfil($idPerfil) {
         }
         input, select {
             width: 100%;
-            padding: 8px;
+            padding: 12px;
             margin-top: 5px;
             border: 1px solid #ccc;
-            border-radius: 5px;
+            border-radius: 8px;
+            font-size: 1.1em;
         }
         .btn-submit {
-            width: 200px;
-            margin: 20px auto;
-            padding: 10px;
+            width: 150px;
+            padding: 12px;
             text-align: center;
-            background-color: #28a745;
-            color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             font-size: 1.1em;
             cursor: pointer;
+            transition: all 0.3s ease;
+            background-color: #28a745;
+            color: white;
         }
         .btn-submit:hover {
-            background-color: #218838;
+            opacity: 0.9;
+        }
+        .btn-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
         }
         .message {
             text-align: center;
@@ -129,6 +141,23 @@ function obterNomePerfil($idPerfil) {
         .error {
             color: #dc3545;
             background-color: #f8d7da;
+        }
+
+        a.btn-submit {
+            display: inline-block;
+            width: 150px;
+            padding: 12px;
+            text-align: center;
+            background-color: #28a745;
+            color: white;
+            border-radius: 8px;
+            font-size: 1.1em;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        a.btn-submit:hover {
+            opacity: 0.9;
         }
     </style>
 </head>
@@ -155,16 +184,26 @@ function obterNomePerfil($idPerfil) {
         </div>
 
         <div class="form-group">
-            <label for="perfil">Perfil:</label>
-            <select id="perfil" name="perfil">
-                <option value="1" <?= $idPerfil == 1 ? 'selected' : '' ?>>Visitante</option>
-                <option value="2" <?= $idPerfil == 2 ? 'selected' : '' ?>>Cliente</option>
-                <option value="3" <?= $idPerfil == 3 ? 'selected' : '' ?>>Funcionário</option>
-                <option value="4" <?= $idPerfil == 4 ? 'selected' : '' ?>>Administrador</option>
-            </select>
+            <label for="morada">Morada:</label>
+            <input type="text" id="morada" name="morada" value="<?= $morada ?>">
         </div>
 
-        <button type="submit" class="btn-submit">Atualizar</button>
+        <div class="form-group">
+            <label for="telemovel">Telemóvel:</label>
+            <input type="text" id="telemovel" name="telemovel" value="<?= $telemovel ?>">
+        </div>
+
+        <div class="btn-group">
+            <button type="submit" class="btn-submit">Atualizar</button>
+
+        <form action="meus_dados.php" method="get">
+           <a href="meus_dados.php" class="btn-submit">Voltar</a>
+        </form>
+
+        <form action="dashboard.php" method="get">
+            <input type="submit" class="btn-submit" value="Dashboard" />
+        </form>
+        </div>
     </form>
 </div>
 
