@@ -34,166 +34,60 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <title>FelixBus - Login</title>
     <link rel="shortcut icon" type="image/png" href="logo.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            /* Verifique o caminho correto da imagem */
-            background: url('banner.jpg') center/cover no-repeat !important;
-            background-size: cover !important;
-            color: #333;
-        }
-
-        /* Estilos de navegação fixa */
-        nav {
-            background: linear-gradient(135deg, #006400, #32CD32);
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 999;
-            padding: 10px 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-            transition: background 0.3s ease;
-        }
-
-        .logo {
-            color: white;
-            font-size: 1.8em;
-            font-weight: bold;
-            text-transform: uppercase;
-            margin-left: 20px;
-        }
-
-        nav a {
-            color: white;
-            text-decoration: none;
-            padding: 12px 20px;
-            font-weight: bold;
-            font-size: 1.1em;
-            transition: background-color 0.3s;
-        }
-
-        nav a:hover {
-            background-color: #4CAF50;
-            border-radius: 5px;
-        }
-
-        /* Estilos para o login */
-        .login-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background: rgba(255, 255, 255, 0.8); /* Semi-transparente */
-        }
-
-        .login-box {
-            background-color: white;
-            padding: 40px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 400px;
-        }
-
-        .login-box h2 {
-            text-align: center;
-            margin-bottom: 20px;
-            color: #333;
-        }
-
-        .login-box input {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 1em;
-            color: #333;
-        }
-
-        .login-box button {
-            width: 100%;
-            padding: 12px;
-            margin: 6px;
-            background-color: #32CD32;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 1.1em;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .login-box button:hover {
-            background-color: #28a745;
-        }
-
-        .login-box .error {
-            color: red;
-            text-align: center;
-            margin-top: 10px;
-        }
-
-        footer {
-            background-color: #343a40;
-            color: white;
-            text-align: center;
-            padding: 20px 0;
-            margin-top: 40px;
-        }
-
-        /* Responsividade */
-        @media (max-width: 768px) {
-            .login-box {
-                padding: 20px;
-            }
-
-            .login-box h2 {
-                font-size: 1.5em;
-            }
-
-            nav a {
-                font-size: 1em;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body>
+<body class="body-auth">
 
 <!-- Barra de navegação fixa no topo -->
 <nav>
-    <!-- Torne a logo clicável -->
     <a href="index.php" class="logo">FelixBus</a>
     <div class="menu">
-        <a href="login.php">Login</a>
-        <a href="registo.php">Registo</a>
-        <a href="consultar_rotas.php">Rotas</a>
-        <a href="#">Contactos</a>
+        <a href="login.php" class="active"><i class="fas fa-sign-in-alt"></i> Login</a>
+        <a href="registo.php"><i class="fas fa-user-plus"></i> Registo</a>
+        <a href="consultar_rotas.php"><i class="fas fa-route"></i> Rotas</a>
+        <a href="#"><i class="fas fa-phone"></i> Contactos</a>
     </div>
 </nav>
 
 <!-- Formulário de Login -->
 <div class="login-container">
-    <div class="login-box">
-        <h2>Entrar</h2>
+    <div class="login-box glass-effect">
+        <div class="login-header">
+            <h2>Entrar na sua conta</h2>
+        </div>
+        
         <form method="post">
-            <input type="text" name="username" placeholder="Utilizador" required>
-            <input type="password" name="password" placeholder="Palavra-passe" required>
-            <button type="submit">Entrar</button>
+            <div class="input-group">
+                <i class="fas fa-user"></i>
+                <input type="text" name="username" placeholder="Utilizador" required>
+            </div>
+            
+            <div class="input-group">
+                <i class="fas fa-lock"></i>
+                <input type="password" name="password" placeholder="Palavra-passe" required>
+            </div>
+            
+            <button type="submit" class="btn-login">
+                <i class="fas fa-sign-in-alt"></i> Entrar
+            </button>
+            
+            <div class="login-footer">
+                <p>Não tem conta? <a href="registo.php">Registe-se aqui</a></p>
+                <a href="#" class="forgot-password">Esqueceu a palavra-passe?</a>
+            </div>
         </form>
-            <button href="registo.php">Regista-te</button>
-        <?php if (isset($erro)) echo "<p class='error'>$erro</p>"; ?>
+        
+        <?php if (isset($erro)): ?>
+            <div class="error-message">
+                <i class="fas fa-exclamation-circle"></i> <?= $erro ?>
+            </div>
+        <?php endif; ?>
     </div>
 </div>
 
 <!-- Rodapé -->
-<footer>
+<footer class="footer-transparent">
     &copy; <?= date("Y") ?> FelixBus. Todos os direitos reservados.
 </footer>
 

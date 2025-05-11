@@ -10,234 +10,11 @@ $alertas = mysqli_query($ligacao, "SELECT * FROM alerta ORDER BY dataPublicacao 
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
-    <title>FelixBus - Bem-vindo</title>
+    <title>FelixBus - Login</title>
     <link rel="shortcut icon" type="image/png" href="logo.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f6f8;
-            color: #333;
-        }
-
-        /* Estilos para o Hero Banner */
-        .hero {
-            position: relative;
-            height: 700px; /* Aumentamos a altura */
-            background: url('banner.jpg') center/cover no-repeat;
-            color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-        }
-
-        .hero::after {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5); /* Escurece a imagem */
-            z-index: 1;
-        }
-
-        .hero-content {
-            position: relative;
-            z-index: 2;
-        }
-
-        .hero h1 {
-            font-size: 3em;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.6);
-        }
-
-        .hero p {
-            font-size: 1.5em;
-            margin-bottom: 20px;
-            text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
-        }
-
-        .hero-buttons {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-        }
-
-        .hero-buttons a {
-            background-color:rgb(15, 255, 7);
-            color: #333;
-            padding: 12px 25px;
-            border-radius: 5px;
-            text-decoration: none;
-            font-weight: bold;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            transition: background-color 0.3s;
-        }
-
-        .hero-buttons a:hover {
-            background-color:rgb(4, 109, 1);
-        }
-
-        /* Estilos de navegação fixa */
-        nav {
-            background: linear-gradient(135deg, #006400, #32CD32); /* Gradiente de verde */
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 999;
-            padding: 10px 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            transition: background 0.3s ease;
-        }
-
-        /* Logo */
-        .logo {
-            color: white;
-            font-size: 1.8em;
-            font-weight: bold;
-            text-transform: uppercase;
-            margin-left: 20px;
-        }
-
-        /* Links do menu */
-        nav a {
-            color: white;
-            text-decoration: none;
-            padding: 12px 20px;
-            font-weight: bold;
-            font-size: 1.1em;
-            transition: background-color 0.3s;
-        }
-
-        nav a:hover {
-            background-color: #4CAF50; /* Cor de fundo no hover */
-            border-radius: 5px;
-        }
-
-        /* Menu Responsivo */
-        .menu-toggle {
-            display: none;
-            font-size: 2em;
-            color: white;
-            cursor: pointer;
-            margin-right: 20px;
-        }
-
-        .menu {
-            display: flex;
-            gap: 30px;
-        }
-
-        /* Estilos para o menu em telas pequenas */
-        @media (max-width: 768px) {
-            .menu {
-                display: none;
-                flex-direction: column;
-                background-color: #333;
-                position: absolute;
-                top: 60px;
-                left: 0;
-                right: 0;
-                padding: 20px;
-                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            }
-
-            nav a {
-                padding: 12px 15px;
-                font-size: 1.2em;
-            }
-
-            .menu.active {
-                display: block;
-            }
-
-            .menu-toggle {
-                display: block;
-            }
-        }
-
-        /* Layout do conteúdo */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 120px 20px 20px;
-        }
-
-        .promo-cards {
-            display: flex;
-            gap: 20px;
-            justify-content: space-between;
-            margin-bottom: 40px;
-        }
-
-        .promo-card {
-            background-color: #ffffff;
-            padding: 20px;
-            flex: 1;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-            text-align: center;
-        }
-
-        .promo-card h3 {
-            margin-bottom: 15px;
-        }
-
-        .promo-card p {
-            font-size: 1.1em;
-            margin-bottom: 15px;
-        }
-
-        .promo-card a {
-            background-color:rgb(15, 255, 7);
-            color: white;
-            padding: 10px 20px;
-            text-decoration: none;
-            border-radius: 5px;
-            font-weight: bold;
-            transition: background-color 0.3s;
-        }
-
-        .promo-card a:hover {
-            background-color:rgb(4, 109, 1);
-        }
-
-        footer {
-            background-color: #343a40;
-            color: white;
-            text-align: center;
-            padding: 20px 0;
-            margin-top: 40px;
-        }
-
-        /* Responsividade */
-        @media (max-width: 768px) {
-            .hero h1 {
-                font-size: 2em;
-            }
-
-            .hero p {
-                font-size: 1.2em;
-            }
-
-            .promo-cards {
-                flex-direction: column;
-            }
-
-            .promo-card {
-                margin-bottom: 20px;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
 
@@ -249,19 +26,31 @@ $alertas = mysqli_query($ligacao, "SELECT * FROM alerta ORDER BY dataPublicacao 
     <span class="menu-toggle" id="menu-toggle">&#9776;</span>
 
     <!-- Links do menu -->
-    <div class="menu" id="menu">
-        <a href="login.php">Login</a>
-        <a href="registo.php">Registo</a>
-        <a href="rotas.php">Rotas</a>
-        <a href="#">Contactos</a>
+    <div class="menu">
+        <a href="login.php" class="active"><i class="fas fa-sign-in-alt"></i> Login</a>
+        <a href="registo.php"><i class="fas fa-user-plus"></i> Registo</a>
+        <a href="rotas.php"><i class="fas fa-route"></i> Rotas</a>
+        <a href="#"><i class="fas fa-phone"></i> Contactos</a>
     </div>
 </nav>
+
+
+
+<nav>
+    <a href="index.php" class="logo">FelixBus</a>
+    <div class="menu">
+        <a href="login.php" class="active"><i class="fas fa-sign-in-alt"></i> Login</a>
+        <a href="registo.php"><i class="fas fa-user-plus"></i> Registo</a>
+        <a href="rotas.php"><i class="fas fa-route"></i> Rotas</a>
+        <a href="#"><i class="fas fa-phone"></i> Contactos</a>
+    </div>
+</nav>
+
 
 <!-- Hero Banner -->
 <div class="hero">
     <div class="hero-content">
-        <h1>Bem-vindo à FelixBus</h1>
-        <p>Viaje com conforto, segurança e eficiência.</p>
+        <h1 style="color: white !important">Bem-vindo à FelixBus <br></h1>
         <div class="hero-buttons">
             <a href="rotas.php">Ver Rotas</a>
             <a href="registo.php">Registe-se Agora</a>

@@ -68,57 +68,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="style.css">
     <title>Atualizar Saldo - FelixBus</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f6f8;
-            margin: 0;
-            padding: 0;
-        }
-
-        .container {
-            max-width: 400px;
-            margin: 50px auto;
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-
-        h2 {
-            text-align: center;
-        }
-
-        input, select, button {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-        }
-
-        button {
-            background-color: #32CD32;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #28a745;
-        }
-
-        .error {
-            color: red;
-            text-align: center;
-        }
-
-        .saldo {
-            text-align: center;
-            font-size: 1.2em;
-        }
-    </style>
 </head>
 <body>
 <div class="container">

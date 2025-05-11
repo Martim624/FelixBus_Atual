@@ -58,57 +58,8 @@ if (!$dadosUtilizador) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
     <title>Meus Dados | FelixBus</title>
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f8f9fa;
-            color: #333;
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            max-width: 900px;
-            margin: 40px auto;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        }
-        h1 {
-            text-align: center;
-            color: #28a745;
-        }
-        .dados {
-            margin-bottom: 20px;
-        }
-        .dados p {
-            font-size: 1.2em;
-            margin: 10px 0;
-        }
-        .botao-editar {
-            display: block;
-            width: 200px;
-            margin: 20px auto;
-            padding: 10px;
-            text-align: center;
-            background-color: #28a745;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 1.1em;
-            text-decoration: none;
-        }
-        .botao-editar:hover {
-            background-color: #218838;
-        }
-        .erro {
-            color: #dc3545;
-            text-align: center;
-            padding: 10px;
-            margin: 20px 0;
-        }
-    </style>
 </head>
 <body>
 

@@ -25,6 +25,7 @@ $resultado = mysqli_query($ligacao, $sql);
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="style.css">
     <title>Meus Bilhetes - FelixBus</title>
 </head>
 <body>
