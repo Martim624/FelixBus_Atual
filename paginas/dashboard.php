@@ -98,7 +98,6 @@ function obterNomePerfil($idPerfil) {
                 <h3>Cliente</h3>
                 <ul>
                     <li><a href="rotas.php">Consultar Rotas</a></li>
-                    <li><a href="comprar_bilhete.php">Comprar Bilhetes</a></li>
                     <li><a href="meus_bilhetes.php">Meus Bilhetes</a></li>
                     <li><a href="carteira.php">Gerir Carteira</a></li>
                 </ul>

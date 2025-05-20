@@ -711,3 +711,39 @@ footer {
     left: 0;
     right: 0;
 }
+
+.filtros {
+            background: #f5f5f5;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        .filtros .form-group {
+            margin-bottom: 10px;
+        }
+        .filtros label {
+            display: inline-block;
+            width: 120px;
+        }
+        .tabela-auditoria {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .tabela-auditoria th, .tabela-auditoria td {
+            padding: 8px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        .tabela-auditoria th {
+            background-color: #f2f2f2;
+        }
+        .tabela-auditoria tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .link-ordenacao {
+            color: #0066cc;
+            text-decoration: none;
+        }
+        .link-ordenacao:hover {
+            text-decoration: underline;
+        }
