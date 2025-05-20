@@ -20,11 +20,19 @@ $filtroDataFim = $_GET['data_fim'] ?? '';
 $ordenacao = $_GET['ordenacao'] ?? 'dataOperacao DESC';
 
 // Construir a query base
-$query = "SELECT a.*, u1.username as origem_nome, u2.username as destino_nome 
+$query = "SELECT 
+            a.id, 
+            a.operacao, 
+            a.valor, 
+            a.idOrigem, 
+            u1.username as origem_nome,
+            a.idDestino, 
+            u2.username as destino_nome,
+            a.descricao,
+            a.dataOperacao
           FROM auditoria a
           LEFT JOIN utilizador u1 ON a.idOrigem = u1.id
-          LEFT JOIN utilizador u2 ON a.idDestino = u2.id
-          WHERE 1=1";
+          LEFT JOIN utilizador u2 ON a.idDestino = u2.id";
 
 // Adicionar filtros
 if (!empty($filtroOperacao)) {

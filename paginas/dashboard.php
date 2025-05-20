@@ -110,6 +110,7 @@ function obterNomePerfil($idPerfil) {
                     <li><a href="gerir_bilhetes.php">Gerir Bilhetes</a></li>
                     <li><a href="consultar_clientes.php">Consultar Clientes</a></li>
                     <li><a href="validar_bilhetes.php">Validar Bilhetes</a></li>
+                    <li><a href="auditoria.php">Auditoria</a></li>
                 </ul>
             <?php endif; ?>
             
@@ -120,7 +121,7 @@ function obterNomePerfil($idPerfil) {
                     <li><a href="gerir_utilizadores.php">Gerir Utilizadores</a></li>
                     <li><a href="gerir_rotas.php">Gerir Rotas</a></li>
                     <li><a href="gerir_alertas.php">Gerir Alertas</a></li>
-                    <li><a href="relatorios.php">Relatórios</a></li>
+                    <li><a href="auditoria.php">Auditoria</a></li>
                 </ul>
             <?php endif; ?>
         </aside>
