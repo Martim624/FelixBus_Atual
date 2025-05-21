@@ -30,17 +30,19 @@ CREATE TABLE utilizador (
     password VARCHAR(100) NOT NULL,
     email VARCHAR(80),
     morada VARCHAR(100),
-    telemovel VARCHAR(15),
+    telemovel VARCHAR(15),  
     idPerfil INT NOT NULL,
+    validado TINYINT(1) DEFAULT 0,
+    ativo TINYINT(1) DEFAULT 1,
     FOREIGN KEY (idPerfil) REFERENCES perfil(idPerfil)
 );
 
 -- Inserção dos utilizadores obrigatórios para login (cliente/cliente, funcionario/funcionario, admin/admin)
-INSERT INTO utilizador (username, password, idPerfil)
+INSERT INTO utilizador (username, password, idPerfil, validado)
 VALUES 
-('cliente', 'cliente', 2),    -- Cliente
-('funcionario', 'funcionario', 3), -- Funcionario
-('admin', 'admin', 4);    -- Administrador
+('cliente', 'cliente', 2, TRUE),    -- Cliente
+('funcionario', 'funcionario', 3, TRUE), -- Funcionario
+('admin', 'admin', 4, TRUE);    -- Administrador
 
 -- -----------------------------
 -- Carteiras

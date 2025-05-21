@@ -13,14 +13,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $resultado = mysqli_stmt_get_result($stmt);
 
     if ($user = mysqli_fetch_assoc($resultado)) {
-        // Definir as variáveis de sessão
-        $_SESSION["id"] = $user["id"];
-        $_SESSION["username"] = $user["username"];
-        $_SESSION["idPerfil"] = $user["idPerfil"];
-        
-        // Redireciona para a dashboard com base no perfil
-        header("Location: dashboard.php");
-        exit();
+        // Verifica se o utilizador está validado
+        // Se o utilizador não estiver validado, exibe uma mensagem de erro
+        // Se o utilizador estiver validado, define as variáveis de sessão
+        if (!$user['validado'] || $user['validado'] == 0) {
+            $erro = "A sua conta ainda não foi validada pelo administrador.";
+        } elseif (isset($user['ativo']) && $user['ativo'] == 0) {
+            $erro = "A sua conta está inativa. Contacte o administrador.";
+        } else {
+            // Definir as variáveis de sessão
+            $_SESSION["id"] = $user["id"];
+            $_SESSION["username"] = $user["username"];
+            $_SESSION["idPerfil"] = $user["idPerfil"];
+            
+            // Redireciona para a dashboard com base no perfil
+            header("Location: dashboard.php");
+            exit();
+        }
     } else {
         $erro = "Credenciais inválidas.";
     }

@@ -2,18 +2,13 @@
 include("../basededados/basedados.h");
 session_start();
 
-// Check if user is logged in and is administrator
+// Verificar se o utilizador está autenticado e é administrador
 if (!isset($_SESSION['id']) || !isset($_SESSION['idPerfil']) || $_SESSION['idPerfil'] != 4) {
     header("Location: login.php");
     exit();
 }
 
-$action = $_GET['action'] ?? '';
-$id = $_GET['id'] ?? null;
-$errors = [];
-$success = '';
-
-// Function to get profile name by id
+// Função para obter o nome do perfil por ID
 function obterNomePerfil($idPerfil) {
     switch($idPerfil) {
         case 1: return 'Visitante';
@@ -24,85 +19,23 @@ function obterNomePerfil($idPerfil) {
     }
 }
 
-// Handle form submissions
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Sanitize inputs
-    $username = trim($_POST['username'] ?? '');
-    $email = trim($_POST['email'] ?? '');
-    $idPerfil = $_POST['idPerfil'] ?? '';
-    $idUser = $_POST['idUser'] ?? null;
+// Atualização do estado de validação
+if (isset($_GET['id']) && isset($_GET['validado'])) {
+    $idUtilizador = (int) $_GET['id'];
+    $validado = (int) $_GET['validado'];
 
-    // Validate inputs
-    if ($username === '') $errors[] = "Nome de utilizador é obrigatório.";
-    if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = "Email inválido.";
-    if (!in_array($idPerfil, ['1','2','3','4'])) $errors[] = "Perfil inválido.";
-    if ($action === 'edit' && $idUser === null) $errors[] = "ID do utilizador inválido.";
-
-    if (empty($errors)) {
-        if ($action === 'add') {
-            // Check if username or email already exists
-            $stmt = mysqli_prepare($ligacao, "SELECT id FROM utilizador WHERE username=? OR email=?");
-            mysqli_stmt_bind_param($stmt, "ss", $username, $email);
-            mysqli_stmt_execute($stmt);
-            mysqli_stmt_store_result($stmt);
-            if (mysqli_stmt_num_rows($stmt) > 0) {
-                $errors[] = "Nome de utilizador ou email já existe.";
-            }
-            mysqli_stmt_close($stmt);
-
-            if (empty($errors)) {
-                // Insert new user without password
-                $stmt = mysqli_prepare($ligacao, "INSERT INTO utilizador (username, email, idPerfil) VALUES (?, ?, ?)");
-                mysqli_stmt_bind_param($stmt, "ssi", $username, $email, $idPerfil);
-                if (mysqli_stmt_execute($stmt)) {
-                    $success = "Utilizador adicionado com sucesso.";
-                    $action = '';
-                } else {
-                    $errors[] = "Erro ao adicionar utilizador: " . mysqli_error($ligacao);
-                }
-                mysqli_stmt_close($stmt);
-            }
-        } elseif ($action === 'edit') {
-            // Update existing user without password
-            $stmt = mysqli_prepare($ligacao, "UPDATE utilizador SET username=?, email=?, idPerfil=? WHERE id=?");
-            mysqli_stmt_bind_param($stmt, "ssii", $username, $email, $idPerfil, $idUser);
-            if (mysqli_stmt_execute($stmt)) {
-                $success = "Utilizador atualizado com sucesso.";
-                $action = '';
-            } else {
-                $errors[] = "Erro ao atualizar utilizador: " . mysqli_error($ligacao);
-            }
-            mysqli_stmt_close($stmt);
-        }
-    }
-}
-
-// Handle delete action
-if ($action === 'delete' && $id) {
-    $stmt = mysqli_prepare($ligacao, "DELETE FROM utilizador WHERE id=?");
-    mysqli_stmt_bind_param($stmt, "i", $id);
+    $stmt = mysqli_prepare($ligacao, "UPDATE utilizador SET validado = ? WHERE id = ?");
+    mysqli_stmt_bind_param($stmt, "ii", $validado, $idUtilizador);
     if (mysqli_stmt_execute($stmt)) {
-        $success = "Utilizador eliminado com sucesso.";
-        $action = '';
+        $sucesso = "Estado de validação atualizado com sucesso.";
     } else {
-        $errors[] = "Erro ao eliminar utilizador: " . mysqli_error($ligacao);
+        $erros[] = "Erro ao atualizar estado de validação: " . mysqli_error($ligacao);
     }
     mysqli_stmt_close($stmt);
 }
 
-// Fetch users for listing or for editing form
-if ($action === 'edit' && $id) {
-    $stmt = mysqli_prepare($ligacao, "SELECT * FROM utilizador WHERE id=?");
-    mysqli_stmt_bind_param($stmt, "i", $id);
-    mysqli_stmt_execute($stmt);
-    $result = mysqli_stmt_get_result($stmt);
-    $user = mysqli_fetch_assoc($result);
-    mysqli_stmt_close($stmt);
-} else {
-    $user = null;
-}
-
-$sql = "SELECT id, username, email, idPerfil FROM utilizador ORDER BY username";
+// Consulta dos utilizadores
+$sql = "SELECT id, username, email, idPerfil, ativo, validado FROM utilizador ORDER BY username";
 $resultado = mysqli_query($ligacao, $sql);
 $users = mysqli_fetch_all($resultado, MYSQLI_ASSOC);
 ?>
@@ -129,75 +62,63 @@ $users = mysqli_fetch_all($resultado, MYSQLI_ASSOC);
 <div class="container">
     <h1>Gerir Utilizadores</h1>
 
-    <?php if (!empty($errors)): ?>
-        <div class="alert alert-error">
-            <ul>
-                <?php foreach ($errors as $erro): ?>
-                    <li><?= htmlspecialchars($erro) ?></li>
-                <?php endforeach; ?>
-            </ul>
-        </div>
+    <a href="adicionar_utilizador.php" class="btn btn-primary">Adicionar Novo Utilizador</a>
+
+    <?php if (!empty($sucesso)): ?>
+        <div class="alert alert-success"><?= htmlspecialchars($sucesso) ?></div>
     <?php endif; ?>
 
-    <?php if ($success): ?>
-        <div class="alert alert-success"><?= htmlspecialchars($success) ?></div>
+    <?php if (!empty($erros)): ?>
+        <?php foreach ($erros as $erro): ?>
+            <div class="alert alert-error"><?= htmlspecialchars($erro) ?></div>
+        <?php endforeach; ?>
     <?php endif; ?>
 
-    <?php if ($action === 'add' || $action === 'edit'): ?>
-        <form method="post" action="gerir_utilizadores.php?action=<?= $action ?><?= $action === 'edit' ? '&id=' . htmlspecialchars($id) : '' ?>">
-            <input type="hidden" name="idUser" value="<?= $user['id'] ?? '' ?>">
-
-            <label for="username">Nome de Utilizador:</label>
-            <input type="text" id="username" name="username" value="<?= htmlspecialchars($user['username'] ?? '') ?>" required>
-
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" value="<?= htmlspecialchars($user['email'] ?? '') ?>" required>
-
-            <label for="idPerfil">Perfil:</label>
-            <select id="idPerfil" name="idPerfil" required>
-                <option value="1" <?= (isset($user['idPerfil']) && $user['idPerfil'] == 1) ? 'selected' : '' ?>>Visitante</option>
-                <option value="2" <?= (isset($user['idPerfil']) && $user['idPerfil'] == 2) ? 'selected' : '' ?>>Cliente</option>
-                <option value="3" <?= (isset($user['idPerfil']) && $user['idPerfil'] == 3) ? 'selected' : '' ?>>Funcionário</option>
-                <option value="4" <?= (isset($user['idPerfil']) && $user['idPerfil'] == 4) ? 'selected' : '' ?>>Administrador</option>
-            </select>
-
-            <button type="submit" class="btn btn-primary"><?= $action === 'add' ? 'Adicionar' : 'Atualizar' ?> Utilizador</button>
-            <a href="gerir_utilizadores.php" class="btn btn-secondary">Cancelar</a>
-        </form>
-    <?php else: ?>
-        <a href="gerir_utilizadores.php?action=add" class="btn btn-primary">Adicionar Novo Utilizador</a>
-
-        <table class="rotas-table">
-            <thead>
+    <table class="rotas-table">
+        <thead>
+            <tr>
+                <th>Nome de Utilizador</th>
+                <th>Email</th>
+                <th>Perfil</th>
+                <th>Estado</th>
+                <th>Validado</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($users as $u): ?>
                 <tr>
-                    <th>Nome de Utilizador</th>
-                    <th>Email</th>
-                    <th>Perfil</th>
-                    <th>Ações</th>
+                    <td><?= htmlspecialchars($u['username']) ?></td>
+                    <td><?= htmlspecialchars($u['email']) ?></td>
+                    <td><?= obterNomePerfil($u['idPerfil']) ?></td>
+                    <td>
+                        <span class="status-label <?= $u['ativo'] ? 'ativo' : 'inativo' ?>">
+                            <?= $u['ativo'] ? 'Ativo' : 'Inativo' ?>
+                        </span>
+                    </td>
+                    <td>
+                        <a href="?id=<?= $u['id'] ?>&validado=<?= $u['validado'] == 1 ? 0 : 1 ?>"
+                           class="btn <?= $u['validado'] == 1 ? 'btn-success' : 'btn-warning' ?>">
+                            <?= $u['validado'] == 1 ? 'Validado' : 'Não Validado' ?>
+                        </a>
+                    </td>
+                    <td>
+                        <a href="editar_utilizador.php?id=<?= $u['id'] ?>" class="btn btn-secondary">Editar</a>
+                        <a href="eliminar_utilizador.php?id=<?= $u['id'] ?>" class="btn btn-danger"
+                           onclick="return confirm('Tem a certeza que deseja eliminar este utilizador?');">
+                           Eliminar
+                        </a>
+                    </td>
                 </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($users as $u): ?>
-                    <tr>
-                        <td><?= htmlspecialchars($u['username']) ?></td>
-                        <td><?= htmlspecialchars($u['email']) ?></td>
-                        <td><?= obterNomePerfil($u['idPerfil']) ?></td>
-                        <td>
-                            <a href="gerir_utilizadores.php?action=edit&id=<?= $u['id'] ?>" class="btn btn-secondary">Editar</a>
-                            <a href="gerir_utilizadores.php?action=delete&id=<?= $u['id'] ?>" class="btn btn-danger" onclick="return confirm('Tem a certeza que deseja eliminar este utilizador?');">Eliminar</a>
-                        </td>
-                    </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
-    <?php endif; ?>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
 </div>
 
 <footer class="footer-transparent">
     &copy; <?= date("Y") ?> FelixBus. Todos os direitos reservados.
 </footer>
 
-<!-- FontAwesome for icons -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
 </body>
 </html>
