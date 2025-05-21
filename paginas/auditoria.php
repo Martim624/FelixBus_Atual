@@ -8,24 +8,24 @@ if (!isset($_SESSION['id']) || !isset($_SESSION['idPerfil']) || ($_SESSION['idPe
     exit();
 }
 
-// Obter dados do usuário
 $idUtilizador = $_SESSION['id'];
 $idPerfil = $_SESSION['idPerfil'];
 $nome = $_SESSION['username'];
 
-// Parâmetros de filtro da URL
+// Filtros da URL
 $filtroOperacao = $_GET['operacao'] ?? '';
 $filtroDataInicio = $_GET['data_inicio'] ?? '';
 $filtroDataFim = $_GET['data_fim'] ?? '';
 $ordenacao = $_GET['ordenacao'] ?? 'dataOperacao DESC';
 
-// Construir a query base
+// Query principal atualizada com ativo do utilizador de origem
 $query = "SELECT 
             a.id, 
             a.operacao, 
             a.valor, 
             a.idOrigem, 
             u1.username as origem_nome,
+            u1.ativo as origem_ativa,
             a.idDestino, 
             u2.username as destino_nome,
             a.descricao,
@@ -34,26 +34,24 @@ $query = "SELECT
           LEFT JOIN utilizador u1 ON a.idOrigem = u1.id
           LEFT JOIN utilizador u2 ON a.idDestino = u2.id";
 
-// Adicionar filtros
+// Filtros
 if (!empty($filtroOperacao)) {
     $query .= " AND a.operacao = '" . mysqli_real_escape_string($ligacao, $filtroOperacao) . "'";
 }
-
 if (!empty($filtroDataInicio)) {
     $query .= " AND a.dataOperacao >= '" . mysqli_real_escape_string($ligacao, $filtroDataInicio) . " 00:00:00'";
 }
-
 if (!empty($filtroDataFim)) {
     $query .= " AND a.dataOperacao <= '" . mysqli_real_escape_string($ligacao, $filtroDataFim) . " 23:59:59'";
 }
 
-// Adicionar ordenação
+// Ordenação
 $query .= " ORDER BY " . mysqli_real_escape_string($ligacao, $ordenacao);
 
 // Executar query
 $result = mysqli_query($ligacao, $query);
 
-// Obter operações distintas para o filtro
+// Obter operações distintas
 $queryOperacoes = "SELECT DISTINCT operacao FROM auditoria ORDER BY operacao";
 $resultOperacoes = mysqli_query($ligacao, $queryOperacoes);
 $operacoes = [];
@@ -65,7 +63,6 @@ while ($row = mysqli_fetch_assoc($resultOperacoes)) {
 function temPerfil($idPerfilRequerido) {
     return $_SESSION['idPerfil'] == $idPerfilRequerido;
 }
-
 function obterNomePerfil($idPerfil) {
     switch($idPerfil) {
         case 1: return 'Visitante';
@@ -84,7 +81,10 @@ function obterNomePerfil($idPerfil) {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Auditoria | FelixBus</title>
     <link rel="stylesheet" href="style.css" />
-
+    <style>
+        .ativo { color: green; font-weight: bold; }
+        .inativo { color: red; font-weight: bold; }
+    </style>
 </head>
 <body>
     <div class="background-blur"></div>
@@ -131,7 +131,7 @@ function obterNomePerfil($idPerfil) {
                     <li><a href="gerir_bilhetes.php">Gerir Bilhetes</a></li>
                     <li><a href="consultar_clientes.php">Consultar Clientes</a></li>
                     <li><a href="validar_bilhetes.php">Validar Bilhetes</a></li>
-                    <li><a href="auditoria.php" class="active">Auditoria</a></li>
+                    <li><a href="auditoria.php">Auditoria</a></li>
                 </ul>
             <?php endif; ?>
 
@@ -142,7 +142,7 @@ function obterNomePerfil($idPerfil) {
                     <li><a href="gerir_rotas.php">Gerir Rotas</a></li>
                     <li><a href="gerir_alertas.php">Gerir Alertas</a></li>
                     <li><a href="relatorios.php">Relatórios</a></li>
-                    <li><a href="auditoria.php" class="active">Auditoria</a></li>
+                    <li><a href="auditoria.php">Auditoria</a></li>
                 </ul>
             <?php endif; ?>
         </aside>
@@ -150,7 +150,7 @@ function obterNomePerfil($idPerfil) {
         <section class="content">
             <h2>Registos de Auditoria</h2>
             
-            <!-- Formulário de Filtros -->
+            <!-- Filtros -->
             <div class="filtros">
                 <form method="get" action="auditoria.php">
                     <div class="form-group">
@@ -182,33 +182,19 @@ function obterNomePerfil($idPerfil) {
                 </form>
             </div>
             
-            <!-- Tabela de Resultados -->
+            <!-- Tabela de auditoria -->
             <?php if ($result && mysqli_num_rows($result) > 0): ?>
                 <table class="tabela-auditoria" aria-label="Tabela de registos de auditoria">
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>
-                                <a href="?operacao=<?= $filtroOperacao ?>&data_inicio=<?= $filtroDataInicio ?>&data_fim=<?= $filtroDataFim ?>&ordenacao=operacao <?= strpos($ordenacao, 'operacao ASC') !== false ? 'DESC' : 'ASC' ?>" 
-                                   class="link-ordenacao">
-                                   Operação <?= strpos($ordenacao, 'operacao') !== false ? (strpos($ordenacao, 'ASC') !== false ? '↑' : '↓') : '' ?>
-                                </a>
-                            </th>
-                            <th>
-                                <a href="?operacao=<?= $filtroOperacao ?>&data_inicio=<?= $filtroDataInicio ?>&data_fim=<?= $filtroDataFim ?>&ordenacao=valor <?= strpos($ordenacao, 'valor ASC') !== false ? 'DESC' : 'ASC' ?>" 
-                                   class="link-ordenacao">
-                                   Valor <?= strpos($ordenacao, 'valor') !== false ? (strpos($ordenacao, 'ASC') !== false ? '↑' : '↓') : '' ?>
-                                </a>
-                            </th>
+                            <th>Operação</th>
+                            <th>Valor</th>
                             <th>Origem</th>
+                            <th>Origem Ativa</th>
                             <th>Destino</th>
                             <th>Descrição</th>
-                            <th>
-                                <a href="?operacao=<?= $filtroOperacao ?>&data_inicio=<?= $filtroDataInicio ?>&data_fim=<?= $filtroDataFim ?>&ordenacao=dataOperacao <?= strpos($ordenacao, 'dataOperacao ASC') !== false ? 'DESC' : 'ASC' ?>" 
-                                   class="link-ordenacao">
-                                   Data/Hora <?= strpos($ordenacao, 'dataOperacao') !== false ? (strpos($ordenacao, 'ASC') !== false ? '↑' : '↓') : '' ?>
-                                </a>
-                            </th>
+                            <th>Data/Hora</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -217,12 +203,17 @@ function obterNomePerfil($idPerfil) {
                                 <td><?= htmlspecialchars($row['id']) ?></td>
                                 <td><?= htmlspecialchars($row['operacao']) ?></td>
                                 <td><?= $row['valor'] ? number_format($row['valor'], 2, ',', '.') . ' €' : '-' ?></td>
+                                <td><?= $row['origem_nome'] ? htmlspecialchars($row['origem_nome']) . ' (#' . $row['idOrigem'] . ')' : ($row['idOrigem'] ? '#' . $row['idOrigem'] : '-') ?></td>
                                 <td>
-                                    <?= $row['origem_nome'] ? htmlspecialchars($row['origem_nome']) . ' (#' . $row['idOrigem'] . ')' : ($row['idOrigem'] ? '#' . $row['idOrigem'] : '-') ?>
+                                    <?php
+                                        if (!is_null($row['origem_ativa'])) {
+                                            echo $row['origem_ativa'] ? '<span class="ativo">Sim</span>' : '<span class="inativo">Não</span>';
+                                        } else {
+                                            echo '-';
+                                        }
+                                    ?>
                                 </td>
-                                <td>
-                                    <?= $row['destino_nome'] ? htmlspecialchars($row['destino_nome']) . ' (#' . $row['idDestino'] . ')' : ($row['idDestino'] ? '#' . $row['idDestino'] : '-') ?>
-                                </td>
+                                <td><?= $row['destino_nome'] ? htmlspecialchars($row['destino_nome']) . ' (#' . $row['idDestino'] . ')' : ($row['idDestino'] ? '#' . $row['idDestino'] : '-') ?></td>
                                 <td><?= htmlspecialchars($row['descricao']) ?></td>
                                 <td><?= htmlspecialchars($row['dataOperacao']) ?></td>
                             </tr>
