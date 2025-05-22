@@ -8,13 +8,13 @@ if (!isset($_SESSION['id']) || !in_array($_SESSION['idPerfil'], [3, 4])) {
     exit();
 }
 
-// Query para obter todos os bilhetes
-$query = "SELECT b.id, b.dataCompra, b.validado,
+// Query para obter todos os bilhetes com dados da rota
+$query = "SELECT b.id, b.dataCompra, b.bilheteValidado,
                  u.username AS cliente_nome,
-                 v.dataViagem, v.horaViagem, v.idRota
+                 r.origem, r.destino, r.dataViagem, r.hora
           FROM bilhete b
           JOIN utilizador u ON b.idUtilizador = u.id
-          JOIN viagem v ON b.idViagem = v.id
+          JOIN rota r ON b.idRota = r.id
           ORDER BY b.dataCompra DESC";
 
 $result = mysqli_query($ligacao, $query);
@@ -40,7 +40,8 @@ $result = mysqli_query($ligacao, $query);
                 <tr>
                     <th>ID</th>
                     <th>Cliente</th>
-                    <th>Rota</th>
+                    <th>Origem</th>
+                    <th>Destino</th>
                     <th>Data da Viagem</th>
                     <th>Hora</th>
                     <th>Data de Compra</th>
@@ -52,14 +53,21 @@ $result = mysqli_query($ligacao, $query);
                     <tr>
                         <td><?= htmlspecialchars($bilhete['id']) ?></td>
                         <td><?= htmlspecialchars($bilhete['cliente_nome']) ?></td>
-                        <td><?= htmlspecialchars($bilhete['idRota']) ?></td>
+                        <td><?= htmlspecialchars($bilhete['origem']) ?></td>
+                        <td><?= htmlspecialchars($bilhete['destino']) ?></td>
                         <td><?= htmlspecialchars($bilhete['dataViagem']) ?></td>
-                        <td><?= htmlspecialchars($bilhete['horaViagem']) ?></td>
+                        <td><?= htmlspecialchars($bilhete['hora']) ?></td>
                         <td><?= htmlspecialchars($bilhete['dataCompra']) ?></td>
                         <td>
-                            <?= $bilhete['validado']
-                                ? '<span class="validado">Sim</span>'
-                                : '<span class="nao-validado">Não</span>' ?>
+                            <?php if ($bilhete['bilheteValidado']): ?>
+                                <span class="validado">Sim</span>
+                            <?php else: ?>
+                                <span class="nao-validado">Não</span>
+                                <form action="validar_bilhete.php" method="POST" style="display:inline;">
+                                    <input type="hidden" name="idBilhete" value="<?= $bilhete['id'] ?>">
+                                    <button type="submit">Validar</button>
+                                </form>
+                            <?php endif; ?>
                         </td>
                     </tr>
                 <?php endwhile; ?>

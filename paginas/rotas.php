@@ -94,9 +94,7 @@ $rotas = mysqli_fetch_all($resultado, MYSQLI_ASSOC);
 </div>
 
 
-<footer class="footer-transparent">
-    &copy; <?= date("Y") ?> FelixBus. Todos os direitos reservados.
-</footer>
+
 </body>
 
 

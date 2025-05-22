@@ -105,6 +105,7 @@ CREATE TABLE bilhete (
     idUtilizador INT NOT NULL,
     idRota INT NOT NULL,
     dataCompra DATETIME DEFAULT CURRENT_TIMESTAMP,
+    bilheteValidado TINYINT(1) DEFAULT 0,
     FOREIGN KEY (idUtilizador) REFERENCES utilizador(id),
     FOREIGN KEY (idRota) REFERENCES rota(id)
 );
