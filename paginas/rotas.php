@@ -94,7 +94,6 @@ $rotas = mysqli_fetch_all($resultado, MYSQLI_ASSOC);
 </div>
 
 
-
 </body>
 
 
